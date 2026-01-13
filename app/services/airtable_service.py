@@ -45,7 +45,7 @@ async def sync_company_to_airtable(c_map: dict):
         
         payload = clean_for_airtable(at_data)
         # Upsert requiere attio_id como campo de texto en Airtable 
-        table_crm.upsert([payload], key_fields=["attio_id"])
+        table_crm.batch_upsert([payload], key_fields=["attio_id"])
         logger.info(f"🚀 Airtable CRM: Sincronizada {c_map.get('name')}")
     except Exception as e:
         logger.error(f"❌ Error Airtable CRM: {e}")
@@ -73,7 +73,7 @@ async def sync_fasttrack_to_airtable(event_type: str, ft_map: dict):
 
         if "created" in event_type:
             # 1. Nodo 'Put it in fast tracks': Marcar check en CRM 
-            table_crm.upsert([{"attio_id": ft_map["parent_record_id"], "Dealflow_Fasttrack": True}], key_fields=["attio_id"])
+            table_crm.batch_upsert([{"attio_id": ft_map["parent_record_id"], "Dealflow_Fasttrack": True}], key_fields=["attio_id"])
             
             # 2. Nodo 'Search records': Buscar por parent_record_id 
             formula = f"{{parent_record_id}} = '{ft_map['parent_record_id']}'"
@@ -86,7 +86,7 @@ async def sync_fasttrack_to_airtable(event_type: str, ft_map: dict):
                 logger.info(f"✅ Dealflow vinculado: {ft_map['entry_id']}")
         else:
             # Nodo 'Update a record based on attio_entry_id' 
-            table_dealflow.upsert([payload], key_fields=["attio_entry_id"])
+            table_dealflow.batch_upsert([payload], key_fields=["attio_entry_id"])
             logger.info(f"✅ Dealflow actualizado: {ft_map['entry_id']}")
 
     except Exception as e:
