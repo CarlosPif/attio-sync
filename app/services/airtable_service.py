@@ -41,7 +41,7 @@ async def sync_company_to_airtable(c_map: dict):
             "ph1_business_type_$startups": c_map["business_type"],
             "Comments ": c_map["comments"]
         }
-        table_crm.upsert([at_data], key_fields=["attio_id"])
+        table_crm.batch_upsert([at_data], key_fields=["attio_id"])
         logger.info(f"🚀 Airtable CRM: Sincronizada {c_map['name']}")
     except Exception as e:
         logger.error(f"❌ Error Airtable CRM: {e}")
@@ -68,7 +68,7 @@ async def sync_fasttrack_to_airtable(event_type: str, ft_map: dict):
 
         if "created" in event_type:
             # 1. Marcar check en CRM (Nodo 'Put it in fast tracks')
-            table_crm.upsert([{"attio_id": ft_map["parent_record_id"], "Dealflow_Fasttrack": True}], key_fields=["attio_id"])
+            table_crm.batch_upsert([{"attio_id": ft_map["parent_record_id"], "Dealflow_Fasttrack": True}], key_fields=["attio_id"])
             
             # 2. Buscar en Dealflow por parent_record_id (Nodo 'Search records')
             formula = f"{{parent_record_id}} = '{ft_map['parent_record_id']}'"

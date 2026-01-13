@@ -134,7 +134,7 @@ async def sync_attio_to_postgres(event: dict, background_tasks):
 
                 #LLAMADA A AIRTABLE
                 import asyncio
-                asyncio.create_task(sync_fasttrack_to_airtable(envent_type, ft_map))
+                asyncio.create_task(sync_fasttrack_to_airtable(event_type, ft_map))
 
     except Exception as e:
         db.rollback()
