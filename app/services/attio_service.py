@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 import httpx
 import logging
 from sqlalchemy.orm import Session
-from app.database import SessionLocal
+from app import database
 from app.models import Company, FastTrack
 from app.services.airtable_service import sync_company_to_airtable, sync_fasttrack_to_airtable
 
@@ -27,7 +27,7 @@ def safe_get(data, key, path="value"):
     except: return None
 
 async def sync_attio_to_postgres(event: dict, background_tasks):
-    db = SessionLocal()
+    db = database.SessionLocal()
     event_type = event.get("event_type", "")
     event_id_info = event.get("id", {})
     
