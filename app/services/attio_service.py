@@ -16,6 +16,11 @@ HEADERS = {"Authorization": f"Bearer {ATTIO_TOKEN}"}
 COMPANY_OBJ_ID = "74c77546-6a6f-4aab-9a19-536d8cfed976"
 LIST_ID = "c1b474e0-90cc-48c3-a98d-135da4a71db0"
 
+from datetime import datetime
+from dateutil import parser
+
+# ... imports ...
+
 def safe_get(data, key, path="value"):
     try:
         val = data.get(key, [])
@@ -25,6 +30,20 @@ def safe_get(data, key, path="value"):
         if path == "domain": return val[0].get("domain")
         return val[0].get("value")
     except: return None
+
+def safe_date(val):
+    if not val: return None
+    try:
+        return parser.parse(val)
+    except:
+        return None
+
+def safe_int(val):
+    if not val: return None
+    try:
+        return int(float(val)) # float handles strings like "100.0"
+    except:
+        return None
 
 async def sync_attio_to_postgres(event: dict, background_tasks):
     db = database.SessionLocal()
@@ -52,15 +71,15 @@ async def sync_attio_to_postgres(event: dict, background_tasks):
                     "id_attio": rid,
                     "name": safe_get(vals, "name"),
                     "domains": safe_get(vals, "domains", "domain"),
-                    "created_at": safe_get(vals, "created_at"),
+                    "created_at": safe_date(safe_get(vals, "created_at")),
                     "one_liner": safe_get(vals, "one_liner"),
                     "stage": safe_get(vals, "stage", "option"),
-                    "round_size": safe_get(vals, "round_size"),
-                    "current_valuation": safe_get(vals, "current_valuation"),
+                    "round_size": safe_int(safe_get(vals, "round_size")),
+                    "current_valuation": safe_int(safe_get(vals, "current_valuation")),
                     "deck_url": safe_get(vals, "deck_url"),
                     "reference": safe_get(vals, "reference_6", "option"),
                     "reference_explanation": safe_get(vals, "reference_explanation"),
-                    "date_sourced": safe_get(vals, "date_sourced"),
+                    "date_sourced": safe_date(safe_get(vals, "date_sourced")),
                     "responsible": safe_get(vals, "responsible", "option"),
                     "company_type": safe_get(vals, "company_type_4", "option"),
                     "fund": safe_get(vals, "fund_7", "option"),
@@ -80,7 +99,8 @@ async def sync_attio_to_postgres(event: dict, background_tasks):
 
                 # LLAMADA A AIRTABLE
                 import asyncio
-                asyncio.create_task(sync_company_to_airtable(c_map))
+                # FIX: Ensure we use background_tasks or safe async execution
+                background_tasks.add_task(sync_company_to_airtable, c_map)
 
             # --- LÓGICA DE FAST TRACKS ---
             elif "entry" in event_type and event_id_info.get("list_id") == LIST_ID:
@@ -104,18 +124,18 @@ async def sync_attio_to_postgres(event: dict, background_tasks):
                     "parent_record_id": pid,
                     "name": comp.name if comp else "Unknown",
                     "potential_program": safe_get(evs, "potential_program"),
-                    "added_to_list_at": safe_get(evs, "created_at"),
+                    "added_to_list_at": safe_date(safe_get(evs, "created_at")),
                     "kill_reasons": safe_get(evs, "kill_reasons"),
                     "contact_status": safe_get(evs, "contact_status", "option"),
-                    "first_videocall_done": safe_get(evs, "first_videocall_done"),
+                    "first_videocall_done": safe_date(safe_get(evs, "first_videocall_done")),
                     "risk": safe_get(evs, "risk"),
                     "urgency": safe_get(evs, "urgency", "option"),
                     "next_steps": safe_get(evs, "next_steps"),
-                    "deadline": safe_get(evs, "deadline"),
+                    "deadline": safe_date(safe_get(evs, "deadline")),
                     "notes": safe_get(evs, "notes"),
-                    "last_contacted": safe_get(evs, "las_contacted"),
-                    "last_modified": safe_get(evs, "last_modified"),
-                    "date_first_contact": safe_get(evs, "date_first_contact_1"),
+                    "last_contacted": safe_date(safe_get(evs, "las_contacted")),
+                    "last_modified": safe_date(safe_get(evs, "last_modified")),
+                    "date_first_contact": safe_date(safe_get(evs, "date_first_contact_1")),
                     "fast_track_status": safe_get(evs, "fast_track_status_6", "status"),
                     # IMPORTANTE: Mantenemos el JSON tal cual
                     "signals_evaluations": evs.get("signals_evaluations"), 
@@ -134,7 +154,8 @@ async def sync_attio_to_postgres(event: dict, background_tasks):
 
                 #LLAMADA A AIRTABLE
                 import asyncio
-                asyncio.create_task(sync_fasttrack_to_airtable(event_type, ft_map))
+                # FIX: Typo fixed here (envent_type -> event_type)
+                background_tasks.add_task(sync_fasttrack_to_airtable, event_type, ft_map)
 
     except Exception as e:
         db.rollback()
