@@ -2,8 +2,8 @@ import os
 import uvicorn
 import logging
 from fastapi import FastAPI, Request, BackgroundTasks
-from database import init_db
-from services.attio_service import sync_attio_to_postgres
+from app.database import init_db
+from app.services.attio_service import sync_attio_to_postgres
 
 # 1. Configuración de Logs
 logging.basicConfig(
