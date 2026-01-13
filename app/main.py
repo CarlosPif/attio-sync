@@ -2,7 +2,6 @@ import os
 import uvicorn
 import logging
 from fastapi import FastAPI, Request, BackgroundTasks
-from app.database import init_db
 from app.services.attio_service import sync_attio_to_postgres
 
 # 1. Configuración de Logs
@@ -16,7 +15,10 @@ app = FastAPI()
 
 # 2. Inicializar base de datos al arrancar
 # Esto asegura que las tablas se creen antes de recibir el primer webhook
-init_db()
+@app.on_event("startup")
+async def startup_event():
+    from app.database import init_db
+    init_db()
 
 @app.get("/")
 async def health_check():
