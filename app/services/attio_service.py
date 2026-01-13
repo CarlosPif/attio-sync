@@ -26,7 +26,7 @@ def safe_get(data, key, path="value"):
         return val[0].get("value")
     except: return None
 
-async def sync_attio_to_postgres(event: dict):
+async def sync_attio_to_postgres(event: dict, background_tasks):
     db = SessionLocal()
     event_type = event.get("event_type", "")
     event_id_info = event.get("id", {})
