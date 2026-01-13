@@ -2,9 +2,9 @@ import os
 import httpx
 import logging
 from sqlalchemy.orm import Session
-from database import SessionLocal
-from models import Company, FastTrack
-from services.airtable_service import sync_company_to_airtable, sync_fasttrack_to_airtable
+from app.database import SessionLocal
+from app.models import Company, FastTrack
+from app.services.airtable_service import sync_company_to_airtable, sync_fasttrack_to_airtable
 
 logger = logging.getLogger("AttioWorker")
 
