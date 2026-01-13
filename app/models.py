@@ -1,6 +1,7 @@
 from sqlalchemy import Column, String, Integer, DateTime, JSON
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.orm import validates
+from app.database import Base
 
 # Definimos la clase de nuestra tabla de companies
 class Company(Base):
