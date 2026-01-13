@@ -35,42 +35,42 @@ class Company(Base):
             return None
         return value
 
-    class FastTrack(Base):
-        __tablename__ = 'fast_tracks'
+class FastTrack(Base):
+    __tablename__ = 'fast_tracks'
 
-        id = Column(Integer, primary_key=True, index=True)
-        entry_id = Column(String, unique=True, index=True)
-        company_id = Column(Integer)
-        parent_record_id = Column(String)
-        name = Column(String)
-        potential_program = Column(String)
-        added_to_list_at = Column(String)
-        kill_reasons = Column(String)
-        contact_status = Column(String)
-        first_videocall_done = Column(String)
-        risk = Column(String)
-        urgency = Column(String)
-        next_steps = Column(String)
-        deadline = Column(String)
-        notes = Column(String)
-        last_contacted = Column(String)
-        last_modified = Column(String)
-        date_first_contact = Column(String)
-        fast_track_status = Column(String)
-        signals_evaluations = Column(JSON)
-        green_flags_summary = Column(String)
-        red_flags_summary = Column(String)
-        signal_comments = Column(String)
+    id = Column(Integer, primary_key=True, index=True)
+    entry_id = Column(String, unique=True, index=True)
+    company_id = Column(Integer)
+    parent_record_id = Column(String)
+    name = Column(String)
+    potential_program = Column(String)
+    added_to_list_at = Column(String)
+    kill_reasons = Column(String)
+    contact_status = Column(String)
+    first_videocall_done = Column(String)
+    risk = Column(String)
+    urgency = Column(String)
+    next_steps = Column(String)
+    deadline = Column(String)
+    notes = Column(String)
+    last_contacted = Column(String)
+    last_modified = Column(String)
+    date_first_contact = Column(String)
+    fast_track_status = Column(String)
+    signals_evaluations = Column(JSON)
+    green_flags_summary = Column(String)
+    red_flags_summary = Column(String)
+    signal_comments = Column(String)
 
-        @validates('signals_evaluations')
-        def validate_json_empty(self, key, value):
-            if isinstance(value, dict) and not value:
-                return None
+    @validates('signals_evaluations')
+    def validate_json_empty(self, key, value):
+        if isinstance(value, dict) and not value:
+            return None
 
-            if isinstance(value, list) and not value:
-                return None
-            
-            if isinstance(value, str) and not value.strip():
-                return None
+        if isinstance(value, list) and not value:
+            return None
+        
+        if isinstance(value, str) and not value.strip():
+            return None
 
-            return value
+        return value
