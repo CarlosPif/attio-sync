@@ -1,4 +1,5 @@
 import os
+from dotenv import load_dotenv
 import httpx
 import logging
 from sqlalchemy.orm import Session
@@ -7,6 +8,8 @@ from app.models import Company, FastTrack
 from app.services.airtable_service import sync_company_to_airtable, sync_fasttrack_to_airtable
 
 logger = logging.getLogger("AttioWorker")
+
+load_dotenv()
 
 ATTIO_TOKEN = os.getenv("ATTIO_TOKEN")
 HEADERS = {"Authorization": f"Bearer {ATTIO_TOKEN}"}

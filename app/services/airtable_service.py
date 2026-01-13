@@ -1,9 +1,11 @@
 import os
+from dotenv import load_dotenv
 import logging
 from pyairtable import Api
 
 logger = logging.getLogger("AttioWorker")
 
+load_dotenv()
 # Configuración
 api = Api(os.getenv("AIRTABLE_TOKEN"))
 
